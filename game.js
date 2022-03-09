@@ -26,7 +26,7 @@
  * fills the gameboard with elements
  */
 const gameBoard = (function() {
-    let gameBoard = new Array(9);
+    let gameBoard = [];
     let gameBoardUI = Array.from(document.querySelectorAll('.cell'));
     
     render();
@@ -40,12 +40,15 @@ const gameBoard = (function() {
     return {render, gameBoard};
 })();
 
-// controls the flow of the game
+/**
+ * gamecontroller module
+ * controls the flow of the game
+ */
 const gameController = (function() {
-    const player1 = Player('John', 'X');
+    const player1 = Player('A', 'X', false, true);
+    const player2 = Player('B', 'O', false, false);
 
     let rounds = 0;
-    let turn = 1;
 
     const winningCombinations = [
         [0,1,2],
@@ -58,18 +61,46 @@ const gameController = (function() {
         [2,4,6]
     ];
 
-    // gameStart();
+    gameStart();
 
+    // function to start the game
     function gameStart() {
-        player1.makeMove();
+        let gameContainer = document.querySelector('.gameContainer');
+        gameContainer.addEventListener('click', (e) => {
+            if (player1.turn) {
+                player1.makeMove(e);
+                player1.turn = false;
+                player2.turn = true;
+                rounds++;
+                console.log(getPlayerCombination(player1.mark))
+                console.log(checkIfGameOver());
+            } else if (player2.turn) {
+                player2.makeMove(e);
+                player2.turn = false;
+                player1.turn = true;
+                rounds++;
+            }
+        })
+        
     };
+    
+    // function to get an array of indizes of the players mark 
+    // to compare against the gameBoard array
+    function getPlayerCombination (playerMark) {
+        return gameBoard.gameBoard.map((el, index) => {
+            return el === playerMark ? index : '';
+        })
+    } 
 
-    function checkIfGameOver(playerHistory) {
+    function checkIfGameOver(playerMark) {
+        let over = null;
         winningCombinations.forEach((arr) => {
             let check = arr.every((num) => {
-                return playerHistory.includes(num);
+               return getPlayerCombination(playerMark).includes(num);
             })
+            check ? over = true : false;
         })
+        return over;
     };
 
     function gameEnd() {
@@ -77,22 +108,24 @@ const gameController = (function() {
     }
 })();
 
-// factory to create player objects
-function Player(name, mark, turn) {
+/**
+ * factory to create player objects
+ * @param {*} name player name
+ * @param {*} mark X or O
+ * @param {*} algo is the player an algorithm or not?
+ * @param {*} turn players turn
+ * @returns 
+ */
+function Player(name, mark, algo, turn) {
     const getName = () => {return name};
-    const getMark = () => {return mark};
 
-    function makeMove() {
-        let gameContainer = document.querySelector('.gameContainer');
-        gameContainer.addEventListener('click', (e) => {
-            let index = e.target.dataset['id'];
-            
-            if (gameBoard.gameBoard[index] === undefined) {
-                gameBoard.gameBoard[index] = mark;
-                gameBoard.render();
-            }
-        })
+    function makeMove(e) {
+        let index = e.target.dataset['id'];
+        if (gameBoard.gameBoard[index] === undefined) {
+            gameBoard.gameBoard[index] = mark;
+            gameBoard.render();
+        }
     }
 
-    return {makeMove, getName, getMark};
+    return {makeMove, getName, mark, algo, turn};
 }
