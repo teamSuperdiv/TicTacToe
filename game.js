@@ -58,7 +58,7 @@ const gameController = (function() {
         [2,4,6]
     ];
 
-    gameStart();
+    // gameStart();
 
     function gameStart() {
         player1.makeMove();
@@ -90,7 +90,6 @@ function Player(name, mark, turn) {
             if (gameBoard.gameBoard[index] === undefined) {
                 gameBoard.gameBoard[index] = mark;
                 gameBoard.render();
-                // console.log(typeof _history[0]);
             }
         })
     }
