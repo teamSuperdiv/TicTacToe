@@ -50,7 +50,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 9rem;
+    font-size: 7.5rem;
     cursor: pointer;
 }
 
@@ -90,8 +90,8 @@ footer {
     align-items: center;
 }
 
-.overlay div {
-    width: 500px;
+.overlay > div {
+    height: 300px;
 }
 
 .choose {
@@ -134,7 +134,17 @@ footer {
     text-decoration: none;
 }
 
-.playerContainer,
-.algoContainer {
-    display: none;
+.playerContainer > div {
+    display: flex;
+    justify-content: space-around;
+}
+
+.algoContainer > div {
+    display: flex;
+    justify-content: center;
+}
+
+.playerContainer label,
+.algoContainer label {
+    display: block;
 }
