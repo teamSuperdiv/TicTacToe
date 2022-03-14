@@ -72,8 +72,8 @@ const gameController = (function() {
                 player1.turn = false;
                 player2.turn = true;
                 rounds++;
-                console.log(getPlayerCombination(player1.mark))
-                console.log(checkIfGameOver());
+                // console.log(getPlayerCombination(player1.mark))
+                // console.log(checkIfGameOver());
             } else if (player2.turn) {
                 player2.makeMove(e);
                 player2.turn = false;
