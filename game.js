@@ -1,25 +1,34 @@
 "use strict";
 
 // Controls the Overlay functionalities
-// const overlay = (function() {
-//     const playerBtn = document.querySelector('#playerVsPlayer');
-//     const algoBtn = document.querySelector('#playerVsAlgo');
-//     const playerContainer = document.querySelector('.playerContainer');
-//     const algoContainer = document.querySelector('.algoContainer');
+const overlay = (function() {
+    const playerBtn = document.querySelector('#playerVsPlayer');
+    const algoBtn = document.querySelector('#playerVsAlgo');
+    const playerContainer = document.querySelector('.playerContainer');
+    const algoContainer = document.querySelector('.algoContainer');
+    
 
-//     displayContainer();
+    // displayContainer();
 
-//     function displayContainer() {
-//         playerBtn.addEventListener('click', () => {
-//             playerContainer.hidden = false;
-//             algoContainer.hidden = true;
-//            }) 
-//            algoBtn.addEventListener('click', () => {
-//             playerContainer.hidden = true;
-//             algoContainer.hidden = false;
-//            })
-//     } 
-// })();
+    function displayContainer() {
+        playerBtn.addEventListener('click', () => {
+            playerContainer.hidden = false;
+            algoContainer.hidden = true;
+           }) 
+           algoBtn.addEventListener('click', () => {
+            playerContainer.hidden = true;
+            algoContainer.hidden = false;
+           })
+    } 
+
+    function displayWinner(player) {
+        const winnerContainer = document.querySelector('.winnerContainer');
+        winnerContainer.textContent = `${player} wins!`
+    }
+
+    return {displayWinner}
+
+})();
 
 /**
  * gameboard module
@@ -29,21 +38,29 @@ const gameBoard = (function() {
     let gameBoard = [];
     let gameBoardUI = Array.from(document.querySelectorAll('.cell'));
     
-    render();
-
+    // renders the content of our gameboard to the DOM gameboard
     function render() {
         gameBoard.forEach((element,index) => {
             gameBoardUI[index].textContent = element;
         })
     };
 
+    // clears the DOM gameboard
+    function clearGameBoard() {
+        gameBoardUI.forEach((el) => {
+           el.classList.remove('winner');
+           el.textContent = '' ;
+        })
+    }
+
+    // displays the winning combination on the DOM
     function renderWinningCombination(arr) {
         arr.forEach((index) => {
             gameBoardUI[index].classList.add('winner');
         })
     }
 
-    return {render, renderWinningCombination, gameBoard};
+    return {render, renderWinningCombination, clearGameBoard, gameBoard};
 })();
 
 /**
@@ -51,17 +68,19 @@ const gameBoard = (function() {
  * controls the flow of the game
  */
 const gameController = (function() {
+    // get player name DOM elements
     const displayPlayer1 = document.querySelector('#player1');
     const displayPlayer2 = document.querySelector('#player2');
 
+    // create the players
     const player1 = Player('Player 1', 'X', false, true);
     const player2 = Player('Player 2', 'O', false, false);
 
+    // set the DOM elements to player's names accordingly
     displayPlayer1.textContent = player1.getName();
     displayPlayer2.textContent = player2.getName();
 
-    let rounds = 0;
-
+    // all possibilities to win the game
     const winningCombinations = [
         [0,1,2],
         [3,4,5],
@@ -73,28 +92,33 @@ const gameController = (function() {
         [2,4,6]
     ];
 
+    // initial boolean to determine whether the game is running or not
+    let gameRunning = false;
+
+    // starts the game
     gameStart();
 
-    // function to start the game
+    // onclick event to restart the game
+    document.querySelector('.restartBtn').addEventListener('click', restart);
+
+    // function to start the gameloop
     function gameStart() {
         let gameContainer = document.querySelector('.gameContainer');
+        gameRunning = true;
         gameContainer.addEventListener('click', (e) => {
-            if (player1.turn) {
+            if (player1.turn && gameRunning) {
                 player1.makeMove(e);
                 player1.turn = false;
                 player2.turn = true;
-                rounds++;
-                console.log(getPlayerCombination(player1.mark));
+                // console.log(getPlayerCombination(player1.mark));
                 gameEnd(player1.mark, player1.getName());
-            } else if (player2.turn) {
+            } else if (player2.turn && gameRunning) {
                 player2.makeMove(e);
                 player2.turn = false;
                 player1.turn = true;
-                rounds++;
                 gameEnd(player2.mark, player2.getName());
             }
-        })
-        
+        }) 
     };
     
     // function to get an array of indizes of the players mark 
@@ -105,6 +129,8 @@ const gameController = (function() {
         }).filter((el) => {return typeof(el) == 'number'});
     } 
 
+    // function checks if game is over by going trough all winning combinations and
+    // checking whether the player combination is one of them
     function checkIfGameOver(playerMark) {
         let over = null;
         winningCombinations.forEach((arr) => {
@@ -116,20 +142,20 @@ const gameController = (function() {
         return over;
     };
 
+    // calls functions to render the winning combination on DOM and to display the winner
     function gameEnd(playerMark, playerName) {
         if(checkIfGameOver(playerMark)) {
-            console.log(`Game over! The winner is ${playerName}!`);
+            gameRunning = false;
             gameBoard.renderWinningCombination(getPlayerCombination(playerMark));
+            overlay.displayWinner(playerName);
         }
-        
     }
 
+    // restart the game
     function restart() {
-        gameBoard.gameBoard = [];
-        gameBoard.render();
-        gameStart();
+        gameBoard.clearGameBoard();
+        gameBoard.gameBoard.length = 0;
     }
-
 })();
 
 /**
