@@ -7,7 +7,6 @@ const overlay = (function() {
     const playerContainer = document.querySelector('.playerContainer');
     const algoContainer = document.querySelector('.algoContainer');
     
-
     // displayContainer();
 
     function displayContainer() {
@@ -22,16 +21,18 @@ const overlay = (function() {
     } 
 
     function displayWinner(player) {
-        const winnerContainer = document.querySelector('.winnerContainer');
-        winnerContainer.textContent = `${player} wins!`
+        document.querySelector('.winnerContainer').textContent = `${player} wins!`;
     }
 
     function displayTie() {
-        const winnerContainer = document.querySelector('.winnerContainer'); 
-        winnerContainer.textContent = "It's a tie!"
+        document.querySelector('.winnerContainer').textContent = "It's a tie!";
     }
 
-    return {displayWinner, displayTie}
+    function clearWinnerContainer() {
+        document.querySelector('.winnerContainer').textContent = '';
+    }
+
+    return {displayWinner, displayTie, clearWinnerContainer}
 
 })();
 
@@ -164,6 +165,7 @@ const gameController = (function() {
         gameBoard.clearGameBoard();
         gameBoard.gameBoard.length = 0;
         gameRunning = true;
+        overlay.clearWinnerContainer();
     }
 })();
 
