@@ -37,7 +37,13 @@ const gameBoard = (function() {
         })
     };
 
-    return {render, gameBoard};
+    function renderWinningCombination(arr) {
+        arr.forEach((index) => {
+            gameBoardUI[index].classList.add('winner');
+        })
+    }
+
+    return {render, renderWinningCombination, gameBoard};
 })();
 
 /**
@@ -45,8 +51,14 @@ const gameBoard = (function() {
  * controls the flow of the game
  */
 const gameController = (function() {
-    const player1 = Player('A', 'X', false, true);
-    const player2 = Player('B', 'O', false, false);
+    const displayPlayer1 = document.querySelector('#player1');
+    const displayPlayer2 = document.querySelector('#player2');
+
+    const player1 = Player('Player 1', 'X', false, true);
+    const player2 = Player('Player 2', 'O', false, false);
+
+    displayPlayer1.textContent = player1.getName();
+    displayPlayer2.textContent = player2.getName();
 
     let rounds = 0;
 
@@ -72,13 +84,14 @@ const gameController = (function() {
                 player1.turn = false;
                 player2.turn = true;
                 rounds++;
-                // console.log(getPlayerCombination(player1.mark))
-                // console.log(checkIfGameOver());
+                console.log(getPlayerCombination(player1.mark));
+                gameEnd(player1.mark, player1.getName());
             } else if (player2.turn) {
                 player2.makeMove(e);
                 player2.turn = false;
                 player1.turn = true;
                 rounds++;
+                gameEnd(player2.mark, player2.getName());
             }
         })
         
@@ -88,8 +101,8 @@ const gameController = (function() {
     // to compare against the gameBoard array
     function getPlayerCombination (playerMark) {
         return gameBoard.gameBoard.map((el, index) => {
-            return el === playerMark ? index : '';
-        })
+            if (el === playerMark) return index;
+        }).filter((el) => {return typeof(el) == 'number'});
     } 
 
     function checkIfGameOver(playerMark) {
@@ -103,9 +116,20 @@ const gameController = (function() {
         return over;
     };
 
-    function gameEnd() {
-
+    function gameEnd(playerMark, playerName) {
+        if(checkIfGameOver(playerMark)) {
+            console.log(`Game over! The winner is ${playerName}!`);
+            gameBoard.renderWinningCombination(getPlayerCombination(playerMark));
+        }
+        
     }
+
+    function restart() {
+        gameBoard.gameBoard = [];
+        gameBoard.render();
+        gameStart();
+    }
+
 })();
 
 /**
