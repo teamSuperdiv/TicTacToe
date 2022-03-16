@@ -26,7 +26,12 @@ const overlay = (function() {
         winnerContainer.textContent = `${player} wins!`
     }
 
-    return {displayWinner}
+    function displayTie() {
+        const winnerContainer = document.querySelector('.winnerContainer'); 
+        winnerContainer.textContent = "It's a tie!"
+    }
+
+    return {displayWinner, displayTie}
 
 })();
 
@@ -148,6 +153,9 @@ const gameController = (function() {
             gameRunning = false;
             gameBoard.renderWinningCombination(getPlayerCombination(playerMark));
             overlay.displayWinner(playerName);
+        } else if (gameBoard.gameBoard.length == 9) {
+            gameRunning = false;
+            overlay.displayTie();
         }
     }
 
@@ -155,6 +163,7 @@ const gameController = (function() {
     function restart() {
         gameBoard.clearGameBoard();
         gameBoard.gameBoard.length = 0;
+        gameRunning = true;
     }
 })();
 
